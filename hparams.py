@@ -21,7 +21,7 @@ d_mlp = 4*d_model
 num_heads = 4
 assert d_model % num_heads == 0
 d_head = d_model//num_heads
-act_type = 'relu' #@param ['ReLU', 'GeLU']
+act_type = 'ReLU' #@param ['ReLU', 'GeLU']
 # batch_size = 512
 use_ln = False
 random_answers = np.random.randint(low=0, high=p, size=(p, p))

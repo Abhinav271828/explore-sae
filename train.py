@@ -1,5 +1,5 @@
 from hparams import lr, weight_decay, num_epochs, save_models, save_every, stopping_thresh, device
-from model import model
+from model import torch_model as model
 from data import train, test
 from utils import full_loss, lines
 
