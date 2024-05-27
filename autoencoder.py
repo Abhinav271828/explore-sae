@@ -29,7 +29,8 @@ sae = AutoEncoder(d_model, d_latent).to('mps')
 
 run_name = 'grok_1716823448'
 layer = 'embeddings'
-data = torch.load(f'activations/{run_name}/final_{layer}.pth', map_location='mps')
+ckpt = 'final'
+data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location='mps')
 
 α = 1e-3
 opt = optim.Adam(sae.parameters(), lr=1e-3)
@@ -58,13 +59,14 @@ for epoch in range(10000):
 save_dict = {
     'model': sae.state_dict(),
     'optimizer': opt.state_dict(),
+    'alpha': α,
     'loss': loss,
     'losses': losses,
     'epoch': epoch,
 }
 
-torch.save(save_dict, root/run_name/f"final.pth")
-print(f"Saved model to {root/run_name/f'final.pth'}")
+torch.save(save_dict, root/run_name/f"{ckpt}_{layer}.pth")
+print(f"Saved model to {root/run_name/f'{ckpt}_{layer}.pth'}")
 
 plt.plot(losses)
 plt.yscale('log')
