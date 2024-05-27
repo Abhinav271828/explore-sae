@@ -21,7 +21,7 @@ run_name = f"grok_{int(time.time())}"
 print(f'Run name {run_name}')
 
 root = Path('save')
-(root/run_name).mkdir(exist_ok=True)
+(root/run_name).mkdir(parents=True,exist_ok=True)
 save_dict = {'model':model.state_dict(), 'train_data': train, 'test_data':test}
 torch.save(save_dict, root/run_name/'init.pth')
 
