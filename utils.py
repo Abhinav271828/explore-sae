@@ -3,6 +3,8 @@ import torch.nn.functional as F
 import numpy as np
 import plotly.graph_objects as go
 
+from hparams import device
+
 def cross_entropy_high_precision(logits, labels):
     # Shapes: batch x vocab, batch
     # Cast logits to float64 because log_softmax has a float32 underflow on overly
@@ -20,7 +22,7 @@ def fn(i, j):
 def full_loss(model, data):
     # Take the final position only
     logits = model(data)[:, -1]
-    labels = torch.tensor([fn(i, j) for i, j, _ in data]).to('mps')
+    labels = torch.tensor([fn(i, j) for i, j, _ in data]).to(device)
     return cross_entropy_high_precision(logits, labels)
 
 def to_numpy(tensor, flat=False):
