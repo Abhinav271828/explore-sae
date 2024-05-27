@@ -22,7 +22,7 @@ def fn(i, j):
 def full_loss(model, data):
     # Take the final position only
     logits = model(data)[:, -1]
-    labels = torch.tensor([fn(i, j) for i, j, _ in data]).to(device)
+    labels = (data[:, 0] + data[:, 1]).remainder(113)
     return cross_entropy_high_precision(logits, labels)
 
 def to_numpy(tensor, flat=False):
