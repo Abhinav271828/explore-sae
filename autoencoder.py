@@ -32,7 +32,7 @@ layer = 'embeddings'
 ckpt = 'final'
 data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location='mps')
 
-α = 1e-3
+α = 1e-5
 opt = optim.Adam(sae.parameters(), lr=1e-3)
 stopping_thresh = 0.0001
 
