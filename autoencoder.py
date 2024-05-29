@@ -33,7 +33,7 @@ if __name__ == '__main__':
     
     α = 1e-6
     opt = optim.Adam(sae.parameters(), lr=1e-3)
-    stopping_thresh = 0.0001
+    stopping_thresh = -1
 
     root = Path('sae')
     (root/run_name).mkdir(parents=True,exist_ok=True)
@@ -65,8 +65,8 @@ if __name__ == '__main__':
         'epoch': epoch,
     }
 
-    #torch.save(save_dict, root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth")
-    #print(f"Saved model to {root/run_name/f'{ckpt}_{layer}_{d_latent}_{α}.pth'}")
+    torch.save(save_dict, root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth")
+    print(f"Saved model to {root/run_name/f'{ckpt}_{layer}_{d_latent}_{α}.pth'}")
 
     plt.plot(losses)
     plt.yscale('log')
