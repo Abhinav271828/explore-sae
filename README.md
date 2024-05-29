@@ -28,5 +28,9 @@ The trained models are saved in the same format.
 ## Storing Activations
 Activations are stored through a notebook `analysis.py`.
 
-## L1 Loss Weight for SAE
-We do a sweep on $\alpha \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 10^2\}$. These weights give the following (MSE) losses (respectively) after 10,000 epochs: $\{5.29 \cdot 10^{-6}, 4.41 \cdot 10^{-6}, 4.85 \cdot 10^{-6}, 1.62 \cdot 10^{-5}, 1.39 \cdot 10^{-4}, 1.18 \cdot 10^{-3}, 1.72 \cdot 10^{-3}, 3.30 \cdot 10^{-3}, 5.82 \cdot 10^{-3}\}$. We therefore use $\alpha = 10^{-5}$.
+## Regularization Coefficient for SAE
+We do a sweep on $\alpha \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 10^2\}$ for each latent size. These weights give the following MSE losses (respectively) after 10,000 epochs.
+
+| Latent size | $10^{-6}$ | $10^{-5}$ | $10^{-4}$ | $10^{-3}$ | $10^{-2}$ | $10^{-1}$ | 1 | 10 | 100 |
+| :---:       | :---:     | :---:     | :---:     | :---:     | :---:     | :---:     | :---: | :---: | :---: |
+| 128         | $1.14 \cdot 10^{-5}$ | $1.49 \cdot 10^{-5}$ | $1.96 \cdot 10^{-5}$ | $3.99 \cdot 10^{-5}$ | $3.7 \cdot 10^{-4}$ | $1.08 \cdot 10^{-3}$ | $1.08 \cdot 10^{-3}$ | $1.51 \cdot 10^{-3}$ | $3.76 \cdot 10^{-2}$ |
