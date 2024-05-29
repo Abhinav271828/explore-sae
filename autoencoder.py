@@ -10,22 +10,16 @@ from hparams import device
 class AutoEncoder(nn.Module):
     def __init__(self, d_model, d_latent):
         super().__init__()
-        self.ff1 = nn.Linear(d_model, d_latent, bias=False)
-        self.enc_bias = nn.Parameter(torch.randn((d_latent,)))
+        self.ff1 = nn.Linear(d_model, d_latent, bias=True)
         self.act = nn.ReLU()
 
         self.ff2 = nn.Linear(d_latent, d_model, bias=False)
         self.dec_bias = nn.Parameter(torch.randn((d_model,)))
 
     def forward(self, x):
-        x -= self.dec_bias
-        x = self.ff1(x)
-        x += self.enc_bias
-        c = self.act(x)
-
-        x = self.ff2(c)
-        x += self.dec_bias
-        return x, c
+        latent = self.act(self.ff1(x - self.dec_bias))
+        output = self.ff2(latent) + self.dec_bias
+        return output, latent
 
 d_model = 128
 d_latent = 128
