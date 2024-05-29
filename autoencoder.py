@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 import os
 import matplotlib.pyplot as plt
+from hparams import device
 
 class AutoEncoder(nn.Module):
     def __init__(self, d_model, d_latent):
@@ -28,7 +29,7 @@ class AutoEncoder(nn.Module):
 
 d_model = 128
 d_latent = 128
-sae = AutoEncoder(d_model, d_latent).to('mps')
+sae = AutoEncoder(d_model, d_latent).to(device)
 
 if __name__ == '__main__':
     run_name = 'grok_1716823448'
