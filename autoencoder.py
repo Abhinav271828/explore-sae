@@ -10,17 +10,20 @@ class AutoEncoder(nn.Module):
     def __init__(self, d_model, d_latent):
         super().__init__()
         self.ff1 = nn.Linear(d_model, d_latent, bias=False)
-        self.bias = nn.Parameter(torch.randn((d_latent,)))
+        self.enc_bias = nn.Parameter(torch.randn((d_latent,)))
         self.act = nn.ReLU()
+
         self.ff2 = nn.Linear(d_latent, d_model, bias=False)
+        self.dec_bias = nn.Parameter(torch.randn((d_model,)))
 
     def forward(self, x):
+        x -= self.dec_bias
         x = self.ff1(x)
-        x += self.bias
+        x += self.enc_bias
         c = self.act(x)
 
         x = self.ff2(c)
-        x -= self.bias
+        x += self.dec_bias
         return x, c
 
 d_model = 128
