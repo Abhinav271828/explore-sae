@@ -31,7 +31,7 @@ if __name__ == '__main__':
     ckpt = 'final'
     data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location=device)
     
-    α = 1e-5
+    α = 1e-6
     opt = optim.Adam(sae.parameters(), lr=1e-3)
     stopping_thresh = 0.0001
 
@@ -42,7 +42,8 @@ if __name__ == '__main__':
 
     for epoch in range(10000):
         output, latent = sae(data)
-        loss = F.mse_loss(output, data) + α * (1/d_latent) * latent.norm()
+        mse_loss = F.mse_loss(output, data)
+        loss = mse_loss + α * (1/d_latent) * latent.norm()
 
         losses.append(loss.item())
 
@@ -64,8 +65,8 @@ if __name__ == '__main__':
         'epoch': epoch,
     }
 
-    torch.save(save_dict, root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth")
-    print(f"Saved model to {root/run_name/f'{ckpt}_{layer}_{d_latent}_{α}.pth'}")
+    #torch.save(save_dict, root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth")
+    #print(f"Saved model to {root/run_name/f'{ckpt}_{layer}_{d_latent}_{α}.pth'}")
 
     plt.plot(losses)
     plt.yscale('log')
