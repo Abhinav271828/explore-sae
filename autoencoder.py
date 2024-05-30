@@ -5,11 +5,15 @@ import time
 from pathlib import Path
 import os
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from hparams import device
 
 class AutoEncoder(nn.Module):
     def __init__(self, d_model, d_latent):
         super().__init__()
+        self.d_model = d_model
+        self.d_latent = d_latent
+
         self.ff1 = nn.Linear(d_model, d_latent, bias=True)
         self.act = nn.ReLU()
 
@@ -21,21 +25,23 @@ class AutoEncoder(nn.Module):
         output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
 
-def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1, verbose=False):
+def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
     opt = optim.Adam(sae.parameters(), lr=lr)
 
+    mse_losses = []
+    reg_losses = []
     losses = []
 
-    for epoch in range(10000):
+    for epoch in tqdm(range(10000)):
         output, latent = sae(data)
-        mse_loss = F.mse_loss(output, data) / d_model
-        reg_loss = α * latent.norm(p=1) / d_latent
+        mse_loss = F.mse_loss(output, data) / sae.d_model
+        reg_loss = α * latent.norm(p=1) / sae.d_latent
         loss = mse_loss + reg_loss
 
+        mse_losses.append(mse_loss.item())
+        reg_losses.append(reg_loss.item())
         losses.append(loss.item())
 
-        if verbose and epoch%100 == 0: print(f"{epoch}_{loss.item():.4f}")
-    
         loss.backward()
         opt.step()
         opt.zero_grad()
@@ -55,7 +61,7 @@ def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1, verbose=Fal
     torch.save(save_dict, save_path)
     print(f"Saved model to {save_path}")
 
-    return losses
+    return mse_loss, reg_loss, loss
 
 if __name__ == '__main__':
     d_model = 128
@@ -74,8 +80,4 @@ if __name__ == '__main__':
     (root/run_name).mkdir(parents=True, exist_ok=True)
     save_path = root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth"
 
-    losses = train_sae(sae, data, α, save_path, stopping_thresh=stopping_thresh)
-
-    plt.plot(losses)
-    plt.yscale('log')
-    plt.show()
+    train_sae(sae, data, α, save_path, stopping_thresh=stopping_thresh)
