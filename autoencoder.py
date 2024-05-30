@@ -25,7 +25,7 @@ class AutoEncoder(nn.Module):
         output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
 
-def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
+def train_sae(sae, data, α, save_path, lr=1e-5, stopping_thresh=-1):
     opt = optim.Adam(sae.parameters(), lr=lr)
 
     mse_losses = []
@@ -35,8 +35,8 @@ def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
     for epoch in tqdm(range(10000)):
         output, latent = sae(data)
         mse_loss = F.mse_loss(output, data) / sae.d_model
-        reg_loss = α * latent.norm(p=1) / sae.d_latent
-        loss = mse_loss + reg_loss
+        reg_loss = latent.norm(p=1) / sae.d_latent
+        loss = mse_loss + α * reg_loss
 
         mse_losses.append(mse_loss.item())
         reg_losses.append(reg_loss.item())
@@ -61,7 +61,7 @@ def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
     torch.save(save_dict, save_path)
     print(f"Saved model to {save_path}")
 
-    return mse_loss, reg_loss, loss
+    return mse_losses, reg_losses, losses
 
 if __name__ == '__main__':
     d_model = 128
