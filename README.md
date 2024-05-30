@@ -18,6 +18,8 @@ The models (checkpoints every 100 epochs) are saved in the `save/` folder:
 ## Training and Saving Autoencoders
 
 * `autoencoder.py`: The definition of the autoencoder model, its data and its training loop.
+* `sweep.py`: A script to sweep over L1 regularization coefficients in the range $10^{-3} \leq \alpha \leq 5 \cdot 10^2$, and compare the reconstruction and regularization losses they achieve [see below].
+
 
 The data used to train the autoencoder is saved in the format `activations/{run_name}/{ckpt}_{layer_name}.pth`.  
 `run_name` is the directory name of the model under `save/`; `ckpt` is the epoch number or `final`; and `layer_name` is the layer whose output is stored.
@@ -29,8 +31,4 @@ The trained models are saved in the same format.
 Activations are stored through a notebook `analysis.py`.
 
 ## Regularization Coefficient for SAE
-We do a sweep on $\alpha \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 10^2\}$ for each latent size. These weights give the following MSE losses (respectively) after 10,000 epochs.
-
-| Latent size | $10^{-6}$ | $10^{-5}$ | $10^{-4}$ | $10^{-3}$ | $10^{-2}$ | $10^{-1}$ | 1 | 10 | 100 |
-| :---:       | :---:     | :---:     | :---:     | :---:     | :---:     | :---:     | :---: | :---: | :---: |
-| 128         | $1.14 \cdot 10^{-5}$ | $1.49 \cdot 10^{-5}$ | $1.96 \cdot 10^{-5}$ | $3.99 \cdot 10^{-5}$ | $3.7 \cdot 10^{-4}$ | $1.08 \cdot 10^{-3}$ | $1.08 \cdot 10^{-3}$ | $1.51 \cdot 10^{-3}$ | $3.76 \cdot 10^{-2}$ |
+We use Method 2 of [Taking features out of superposition with sparse autoencoders](https://www.lesswrong.com/posts/z6QQJbtpkEAX3Aojj/interim-research-report-taking-features-out-of-superposition), where the reconstruction and regularization losses are both plotted and we find the $\alpha$ at which they both plateau.
