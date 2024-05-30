@@ -13,37 +13,24 @@ class AutoEncoder(nn.Module):
         self.ff1 = nn.Linear(d_model, d_latent, bias=True)
         self.act = nn.ReLU()
 
-        self.ff2 = nn.Linear(d_latent, d_model, bias=False)
+        self.ff2 = nn.Parameter(torch.rand((d_latent, d_model)))
         self.dec_bias = nn.Parameter(torch.randn((d_model,)))
 
     def forward(self, x):
-        latent = self.act(self.ff1(x - self.dec_bias))
-        output = self.ff2(latent) + self.dec_bias
+        latent = self.act(self.ff1(x))
+        output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
 
-d_model = 128
-d_latent = 128
-sae = AutoEncoder(d_model, d_latent).to(device)
-
-if __name__ == '__main__':
-    run_name = 'grok_1716823448'
-    layer = 'embeddings'
-    ckpt = 'final'
-    data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location=device)
-    
-    α = 1e-6
-    opt = optim.Adam(sae.parameters(), lr=1e-3)
-    stopping_thresh = -1
-
-    root = Path('sae')
-    (root/run_name).mkdir(parents=True,exist_ok=True)
+def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
+    opt = optim.Adam(sae.parameters(), lr=lr)
 
     losses = []
 
     for epoch in range(10000):
         output, latent = sae(data)
-        mse_loss = F.mse_loss(output, data)
-        loss = mse_loss + α * (1/d_latent) * latent.norm()
+        mse_loss = F.mse_loss(output, data) / d_model
+        reg_loss = α * latent.norm(p=1) / d_latent
+        loss = mse_loss + reg_loss
 
         losses.append(loss.item())
 
@@ -65,8 +52,29 @@ if __name__ == '__main__':
         'epoch': epoch,
     }
 
-    torch.save(save_dict, root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth")
-    print(f"Saved model to {root/run_name/f'{ckpt}_{layer}_{d_latent}_{α}.pth'}")
+    torch.save(save_dict, save_path)
+    print(f"Saved model to {save_path}")
+
+    return losses
+
+if __name__ == '__main__':
+    d_model = 128
+    d_latent = 128
+    sae = AutoEncoder(d_model, d_latent).to(device)
+    
+    run_name = 'grok_1716823448'
+    layer = 'embeddings'
+    ckpt = 'final'
+    data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location=device)
+
+    α = 1e-6
+    stopping_thresh = -1
+
+    root = Path('sae')
+    (root/run_name).mkdir(parents=True, exist_ok=True)
+    save_path = root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth"
+
+    losses = train_sae(sae, data, α, save_path, stopping_thresh=stopping_thresh)
 
     plt.plot(losses)
     plt.yscale('log')
