@@ -21,7 +21,7 @@ class AutoEncoder(nn.Module):
         output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
 
-def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
+def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1, verbose=False):
     opt = optim.Adam(sae.parameters(), lr=lr)
 
     losses = []
@@ -34,7 +34,7 @@ def train_sae(sae, data, α, save_path, lr=1e-3, stopping_thresh=-1):
 
         losses.append(loss.item())
 
-        if epoch%100 == 0: print(f"{epoch}_{loss.item():.4f}")
+        if verbose and epoch%100 == 0: print(f"{epoch}_{loss.item():.4f}")
     
         loss.backward()
         opt.step()
