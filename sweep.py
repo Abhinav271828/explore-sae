@@ -14,7 +14,8 @@ ckpt = 'final'
 data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location=device)
 
 alphas = []
-losses = torch.zeros(18, 2, 25)
+num_runs = 25
+losses = torch.zeros(18, 2, num_runs)
 i = 0
 
 for exp in [-3, -2, -1, 0, 1, 2]:
@@ -26,7 +27,8 @@ for exp in [-3, -2, -1, 0, 1, 2]:
         (root/run_name).mkdir(parents=True, exist_ok=True)
         save_path = root/run_name/f"{ckpt}_{layer}_{d_latent}_{c}e{exp}.pth"
 
-        for t in range(25):
+        for t in range(num_runs):
+            print(f"Run {t+1}/{num_runs}")
             cur_mse_losses, cur_reg_losses, _ = train_sae(AutoEncoder(d_model, d_latent).to(device), data, α, save_path)
             losses[i, 0, t] = cur_mse_losses[-1]
             losses[i, 1, t] = cur_reg_losses[-1]
@@ -36,6 +38,7 @@ for exp in [-3, -2, -1, 0, 1, 2]:
         print("Average Reg loss:", losses[i, 1].mean().item())
         i += 1
 
+torch.save(losses, 'losses.pt')
 plt.figure()
 plt.errorbar(alphas, losses.mean(dim=2)[0], yerr=losses.std(dim=2)[0], label='MSE')
 plt.errorbar(alphas, losses.mean(dim=2)[1], yerr=losses.std(dim=2)[1], label='Reg')
