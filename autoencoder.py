@@ -14,14 +14,16 @@ class AutoEncoder(nn.Module):
         self.d_model = d_model
         self.d_latent = d_latent
 
-        self.ff1 = nn.Linear(d_model, d_latent, bias=True)
+        self.ff1 = nn.Linear(d_model, d_latent, bias=False)
+        self.enc_bias = nn.Parameter(torch.randn((d_latent,)))
         self.act = nn.ReLU()
 
-        self.ff2 = nn.Parameter(torch.rand((d_latent, d_model)))
+        self.ff2 = nn.Parameter(torch.randn((d_latent, d_model)))
         self.dec_bias = nn.Parameter(torch.randn((d_model,)))
 
     def forward(self, x):
-        latent = self.act(self.ff1(x))
+        latent = self.act(self.ff1(x - self.dec_bias) + self.enc_bias)
+
         output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
 
@@ -68,6 +70,7 @@ if __name__ == '__main__':
     d_latent = 128
     sae = AutoEncoder(d_model, d_latent).to(device)
     
+    arch = 'blrMb' # ['blrMb', 'lrl']
     run_name = 'grok_1716823448'
     layer = 'embeddings'
     ckpt = 'final'
@@ -77,7 +80,7 @@ if __name__ == '__main__':
     stopping_thresh = -1
 
     root = Path('sae')
-    (root/run_name).mkdir(parents=True, exist_ok=True)
+    (root/run_name/arch).mkdir(parents=True, exist_ok=True)
     save_path = root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth"
 
     train_sae(sae, data, α, save_path, stopping_thresh=stopping_thresh)

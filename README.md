@@ -24,7 +24,10 @@ The models (checkpoints every 100 epochs) are saved in the `save/` folder:
 The data used to train the autoencoder is saved in the format `activations/{run_name}/{ckpt}_{layer_name}.pth`.  
 `run_name` is the directory name of the model under `save/`; `ckpt` is the epoch number or `final`; and `layer_name` is the layer whose output is stored.
 
-The trained models are saved in the same format.
+The trained models are saved in the same format, inside a directory describing their architecture. These are:
+
+* `lrl`: linear layer (matrix with bias), ReLU, linear layer
+* `blrMb`: (subtract) bias, linear layer, ReLU, matrix, (add) bias (tied)
 
 # Uncommitted Info
 ## Storing Activations
@@ -32,3 +35,5 @@ Activations are stored through a notebook `analysis.py`.
 
 ## Regularization Coefficient for SAE
 We use Method 2 of [Taking features out of superposition with sparse autoencoders](https://www.lesswrong.com/posts/z6QQJbtpkEAX3Aojj/interim-research-report-taking-features-out-of-superposition), where the reconstruction and regularization losses are both plotted and we find the $\alpha$ at which they both plateau.
+
+In the case of latent sizes 128 and 256, none of the `lrl` autoencoders achieve a reconstruction accuracy above 1%.
