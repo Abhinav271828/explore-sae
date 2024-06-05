@@ -15,8 +15,8 @@ class AutoEncoder(nn.Module):
         self.d_latent = d_latent
 
         self.ff1 = nn.Linear(d_model, d_latent, bias=False) # [for blrMb]
-        # self.ff1 = nn.Linear(d_model, d_latent, bias=True # [for lrl]
-        self.enc_bias = nn.Parameter(torch.randn((d_latent,)))
+        #self.ff1 = nn.Linear(d_model, d_latent, bias=True) # [for lrl]
+        self.enc_bias = nn.Parameter(torch.randn((d_latent,))) # [for blrMb]
         self.act = nn.ReLU()
 
         self.ff2 = nn.Parameter(torch.randn((d_latent, d_model)))
