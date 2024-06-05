@@ -38,10 +38,10 @@ for exp in [-3, -2, -1, 0, 1, 2]:
         print("Average Reg loss:", losses[i, 1].mean().item())
         i += 1
 
-torch.save(losses, 'losses.pt')
+torch.save(losses, f'losses-{d_latent}-{num_runs}.pt')
 plt.figure()
-plt.errorbar(alphas, losses.mean(dim=2)[0], yerr=losses.std(dim=2)[0], label='MSE')
-plt.errorbar(alphas, losses.mean(dim=2)[1], yerr=losses.std(dim=2)[1], label='Reg')
+plt.errorbar(alphas, losses.mean(dim=2)[:, 0], yerr=losses.std(dim=2)[0], label='MSE')
+plt.errorbar(alphas, losses.mean(dim=2)[:, 1], yerr=losses.std(dim=2)[1], label='Reg')
 plt.xscale('log')
 plt.yscale('log')
 plt.legend()
