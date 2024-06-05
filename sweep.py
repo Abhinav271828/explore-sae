@@ -6,7 +6,7 @@ from autoencoder import AutoEncoder, train_sae
 from hparams import device
 
 d_model = 128
-d_latent = 128
+d_latent = 512
 
 run_name = 'grok_1716823448'
 layer = 'embeddings'
@@ -14,7 +14,7 @@ ckpt = 'final'
 data = torch.load(f'activations/{run_name}/{ckpt}_{layer}.pth', map_location=device)
 
 alphas = []
-num_runs = 25
+num_runs = 1
 losses = torch.zeros(18, 2, num_runs)
 i = 0
 
@@ -40,8 +40,8 @@ for exp in [-3, -2, -1, 0, 1, 2]:
 
 torch.save(losses, f'losses-{d_latent}-{num_runs}.pt')
 plt.figure()
-plt.errorbar(alphas, losses.mean(dim=2)[:, 0], yerr=losses.std(dim=2)[0], label='MSE')
-plt.errorbar(alphas, losses.mean(dim=2)[:, 1], yerr=losses.std(dim=2)[1], label='Reg')
+plt.errorbar(alphas, losses.mean(dim=2)[:, 0], yerr=losses.std(dim=2)[:, 0], label='MSE')
+plt.errorbar(alphas, losses.mean(dim=2)[:, 1], yerr=losses.std(dim=2)[:, 1], label='Reg')
 plt.xscale('log')
 plt.yscale('log')
 plt.legend()
