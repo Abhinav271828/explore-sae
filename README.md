@@ -36,4 +36,4 @@ Activations are stored through a notebook `analysis.py`.
 ## Regularization Coefficient for SAE
 We use Method 2 of [Taking features out of superposition with sparse autoencoders](https://www.lesswrong.com/posts/z6QQJbtpkEAX3Aojj/interim-research-report-taking-features-out-of-superposition), where the reconstruction and regularization losses are both plotted and we find the $\alpha$ at which they both plateau.
 
-In the case of latent sizes 128 and 256, none of the `lrl` autoencoders achieve a reconstruction accuracy above 1%.
+In the case of latent sizes 128, 256 and 512, none of the `lrl` or `blrMb` autoencoders achieve a reconstruction accuracy above 1%.
