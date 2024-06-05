@@ -14,7 +14,8 @@ class AutoEncoder(nn.Module):
         self.d_model = d_model
         self.d_latent = d_latent
 
-        self.ff1 = nn.Linear(d_model, d_latent, bias=False)
+        self.ff1 = nn.Linear(d_model, d_latent, bias=False) # [for blrMb]
+        # self.ff1 = nn.Linear(d_model, d_latent, bias=True # [for lrl]
         self.enc_bias = nn.Parameter(torch.randn((d_latent,)))
         self.act = nn.ReLU()
 
@@ -22,7 +23,8 @@ class AutoEncoder(nn.Module):
         self.dec_bias = nn.Parameter(torch.randn((d_model,)))
 
     def forward(self, x):
-        latent = self.act(self.ff1(x - self.dec_bias) + self.enc_bias)
+        latent = self.act(self.ff1(x - self.dec_bias) + self.enc_bias) # [for blrMb]
+        #latent = self.act(self.ff1(x)) # [for lrl]
 
         output = latent @ F.normalize(self.ff2, p=2, dim=1) + self.dec_bias
         return output, latent
@@ -81,6 +83,6 @@ if __name__ == '__main__':
 
     root = Path('sae')
     (root/run_name/arch).mkdir(parents=True, exist_ok=True)
-    save_path = root/run_name/f"{ckpt}_{layer}_{d_latent}_{α}.pth"
+    save_path = root/run_name/arch/f"{ckpt}_{layer}_{d_latent}_{α}.pth"
 
     train_sae(sae, data, α, save_path, stopping_thresh=stopping_thresh)
